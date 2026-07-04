@@ -1,33 +1,33 @@
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Create ScreenGui
+-- ScreenGui
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "WorkoutGUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Main Frame - Modern Black
+-- Main Frame - Modern Dark
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 190, 0, 145)
-mainFrame.Position = UDim2.new(0.5, -95, 0.5, -72)
-mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-mainFrame.BackgroundTransparency = 0.08
+mainFrame.Size = UDim2.new(0, 200, 0, 155)
+mainFrame.Position = UDim2.new(0.5, -100, 0.5, -77)
+mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+mainFrame.BackgroundTransparency = 0.05
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
 
--- Modern styling
+-- Modern UI Styling
 local uiCorner = Instance.new("UICorner")
-uiCorner.CornerRadius = UDim.new(0, 12)
+uiCorner.CornerRadius = UDim.new(0, 16)
 uiCorner.Parent = mainFrame
 
 local uiStroke = Instance.new("UIStroke")
-uiStroke.Color = Color3.fromRGB(55, 55, 55)
-uiStroke.Thickness = 1.5
+uiStroke.Color = Color3.fromRGB(40, 40, 40)
+uiStroke.Thickness = 1.8
 uiStroke.Parent = mainFrame
 
--- Draggable (PC + Mobile)
+-- Draggable (Mobile + PC)
 local dragging = false
 local dragStart = nil
 local startPos = nil
@@ -57,81 +57,86 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
     end
 end)
 
--- Title
+-- Title (fits perfectly)
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 32)
+title.Size = UDim2.new(1, 0, 0, 35)
 title.BackgroundTransparency = 1
 title.Text = "WORKOUT TOGGLES"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextScaled = true
-title.Font = Enum.Font.GothamBold
+title.Font = Enum.Font.GothamBlack
 title.Parent = mainFrame
 
--- Credits
+-- Credits (fits at bottom)
 local credits = Instance.new("TextLabel")
-credits.Size = UDim2.new(1, 0, 0, 16)
-credits.Position = UDim2.new(0, 0, 1, -16)
+credits.Size = UDim2.new(1, 0, 0, 18)
+credits.Position = UDim2.new(0, 0, 1, -18)
 credits.BackgroundTransparency = 1
 credits.Text = "Made by 5xscripts"
-credits.TextColor3 = Color3.fromRGB(140, 140, 140)
+credits.TextColor3 = Color3.fromRGB(160, 160, 160)
 credits.TextScaled = true
 credits.Font = Enum.Font.Gotham
-credits.TextTransparency = 0.5
+credits.TextTransparency = 0.4
 credits.Parent = mainFrame
 
 -- Pushup Button
 local pushupButton = Instance.new("TextButton")
-pushupButton.Size = UDim2.new(0.9, 0, 0, 40)
-pushupButton.Position = UDim2.new(0.05, 0, 0.29, 0)
-pushupButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+pushupButton.Size = UDim2.new(0.88, 0, 0, 42)
+pushupButton.Position = UDim2.new(0.06, 0, 0.32, 0)
+pushupButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 pushupButton.Text = "Pushup: OFF"
-pushupButton.TextColor3 = Color3.fromRGB(255, 80, 80)
+pushupButton.TextColor3 = Color3.fromRGB(255, 85, 85)
 pushupButton.TextScaled = true
 pushupButton.Font = Enum.Font.GothamSemibold
 pushupButton.Parent = mainFrame
 
 local pushCorner = Instance.new("UICorner")
-pushCorner.CornerRadius = UDim.new(0, 8)
+pushCorner.CornerRadius = UDim.new(0, 10)
 pushCorner.Parent = pushupButton
+
+local pushStroke = Instance.new("UIStroke")
+pushStroke.Color = Color3.fromRGB(70, 70, 70)
+pushStroke.Thickness = 1.2
+pushStroke.Parent = pushupButton
 
 -- Situp Button
 local situpButton = Instance.new("TextButton")
-situpButton.Size = UDim2.new(0.9, 0, 0, 40)
-situpButton.Position = UDim2.new(0.05, 0, 0.62, 0)
-situpButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+situpButton.Size = UDim2.new(0.88, 0, 0, 42)
+situpButton.Position = UDim2.new(0.06, 0, 0.65, 0)
+situpButton.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 situpButton.Text = "Situp: OFF"
-situpButton.TextColor3 = Color3.fromRGB(255, 80, 80)
+situpButton.TextColor3 = Color3.fromRGB(255, 85, 85)
 situpButton.TextScaled = true
 situpButton.Font = Enum.Font.GothamSemibold
 situpButton.Parent = mainFrame
 
 local sitCorner = Instance.new("UICorner")
-sitCorner.CornerRadius = UDim.new(0, 8)
+sitCorner.CornerRadius = UDim.new(0, 10)
 sitCorner.Parent = situpButton
 
--- Loop control
-local pushupLoop = nil
-local situpLoop = nil
-local pushupActive = false
-local situpActive = false
+local sitStroke = Instance.new("UIStroke")
+sitStroke.Color = Color3.fromRGB(70, 70, 70)
+sitStroke.Thickness = 1.2
+sitStroke.Parent = situpButton
+
+-- Loop variables
+local pushupLoop, situpLoop = nil, nil
+local pushupActive, situpActive = false, false
 
 -- Pushup Toggle + Loop
 pushupButton.MouseButton1Click:Connect(function()
     pushupActive = not pushupActive
     if pushupActive then
         pushupButton.Text = "Pushup: ON"
-        pushupButton.TextColor3 = Color3.fromRGB(80, 255, 80)
+        pushupButton.TextColor3 = Color3.fromRGB(85, 255, 85)
         
         pushupLoop = game:GetService("RunService").Heartbeat:Connect(function()
             game:GetService("ReplicatedStorage").Remotes.PushUp:FireServer("{}")
         end)
     else
         pushupButton.Text = "Pushup: OFF"
-        pushupButton.TextColor3 = Color3.fromRGB(255, 80, 80)
-        if pushupLoop then
-            pushupLoop:Disconnect()
-            pushupLoop = nil
-        end
+        pushupButton.TextColor3 = Color3.fromRGB(255, 85, 85)
+        if pushupLoop then pushupLoop:Disconnect() pushupLoop = nil end
     end
 end)
 
@@ -140,18 +145,15 @@ situpButton.MouseButton1Click:Connect(function()
     situpActive = not situpActive
     if situpActive then
         situpButton.Text = "Situp: ON"
-        situpButton.TextColor3 = Color3.fromRGB(80, 255, 80)
+        situpButton.TextColor3 = Color3.fromRGB(85, 255, 85)
         
         situpLoop = game:GetService("RunService").Heartbeat:Connect(function()
             game:GetService("ReplicatedStorage").Remotes.SitUp:FireServer("{}")
         end)
     else
         situpButton.Text = "Situp: OFF"
-        situpButton.TextColor3 = Color3.fromRGB(255, 80, 80)
-        if situpLoop then
-            situpLoop:Disconnect()
-            situpLoop = nil
-        end
+        situpButton.TextColor3 = Color3.fromRGB(255, 85, 85)
+        if situpLoop then situpLoop:Disconnect() situpLoop = nil end
     end
 end)
 
