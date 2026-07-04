@@ -1,0 +1,136 @@
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Create ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "WorkoutGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+-- Main Frame (slightly bigger for mobile)
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 180, 0, 130)
+mainFrame.Position = UDim2.new(0.5, -90, 0.5, -65)
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+mainFrame.BackgroundTransparency = 0.25
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+-- Rounded corners
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 8)
+uiCorner.Parent = mainFrame
+
+-- Draggable (fully supports mobile touch)
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+local function update(input)
+    if not dragging then return end
+    local delta = input.Position - dragStart
+    mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        update(input)
+    end
+end)
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 28)
+title.BackgroundTransparency = 1
+title.Text = "Workout Toggles"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextScaled = true
+title.Font = Enum.Font.SourceSansBold
+title.Parent = mainFrame
+
+-- Credits
+local credits = Instance.new("TextLabel")
+credits.Size = UDim2.new(1, 0, 0, 18)
+credits.Position = UDim2.new(0, 0, 1, -18)
+credits.BackgroundTransparency = 1
+credits.Text = "Made by 5xscripts"
+credits.TextColor3 = Color3.fromRGB(170, 170, 170)
+credits.TextScaled = true
+credits.Font = Enum.Font.SourceSans
+credits.TextTransparency = 0.4
+credits.Parent = mainFrame
+
+-- Pushup Button
+local pushupButton = Instance.new("TextButton")
+pushupButton.Size = UDim2.new(0.9, 0, 0, 38) -- Bigger touch target
+pushupButton.Position = UDim2.new(0.05, 0, 0.3, 0)
+pushupButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+pushupButton.Text = "Pushup: OFF"
+pushupButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+pushupButton.TextScaled = true
+pushupButton.Font = Enum.Font.SourceSansSemibold
+pushupButton.Parent = mainFrame
+
+local pushCorner = Instance.new("UICorner")
+pushCorner.CornerRadius = UDim.new(0, 6)
+pushCorner.Parent = pushupButton
+
+-- Situp Button
+local situpButton = Instance.new("TextButton")
+situpButton.Size = UDim2.new(0.9, 0, 0, 38)
+situpButton.Position = UDim2.new(0.05, 0, 0.65, 0)
+situpButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+situpButton.Text = "Situp: OFF"
+situpButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+situpButton.TextScaled = true
+situpButton.Font = Enum.Font.SourceSansSemibold
+situpButton.Parent = mainFrame
+
+local sitCorner = Instance.new("UICorner")
+sitCorner.CornerRadius = UDim.new(0, 6)
+sitCorner.Parent = situpButton
+
+-- Toggles
+local pushupActive = false
+local situpActive = false
+
+pushupButton.MouseButton1Click:Connect(function()
+    pushupActive = not pushupActive
+    if pushupActive then
+        pushupButton.Text = "Pushup: ON"
+        pushupButton.TextColor3 = Color3.fromRGB(100, 255, 100)
+    else
+        pushupButton.Text = "Pushup: OFF"
+        pushupButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+    end
+    game:GetService("ReplicatedStorage").Remotes.PushUp:FireServer("{}")
+end)
+
+situpButton.MouseButton1Click:Connect(function()
+    situpActive = not situpActive
+    if situpActive then
+        situpButton.Text = "Situp: ON"
+        situpButton.TextColor3 = Color3.fromRGB(100, 255, 100)
+    else
+        situpButton.Text = "Situp: OFF"
+        situpButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+    end
+    game:GetService("ReplicatedStorage").Remotes.SitUp:FireServer("{}")
+end)
+
+print("Workout GUI loaded! (Mobile supported - 5xscripts)")
