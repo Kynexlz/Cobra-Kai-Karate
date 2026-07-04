@@ -7,22 +7,27 @@ screenGui.Name = "WorkoutGUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- Main Frame (slightly bigger for mobile)
+-- Main Frame - Modern Black
 local mainFrame = Instance.new("Frame")
 mainFrame.Name = "MainFrame"
-mainFrame.Size = UDim2.new(0, 180, 0, 130)
-mainFrame.Position = UDim2.new(0.5, -90, 0.5, -65)
-mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-mainFrame.BackgroundTransparency = 0.25
+mainFrame.Size = UDim2.new(0, 190, 0, 145)
+mainFrame.Position = UDim2.new(0.5, -95, 0.5, -72)
+mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+mainFrame.BackgroundTransparency = 0.08
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
 
--- Rounded corners
+-- Modern styling
 local uiCorner = Instance.new("UICorner")
-uiCorner.CornerRadius = UDim.new(0, 8)
+uiCorner.CornerRadius = UDim.new(0, 12)
 uiCorner.Parent = mainFrame
 
--- Draggable (fully supports mobile touch)
+local uiStroke = Instance.new("UIStroke")
+uiStroke.Color = Color3.fromRGB(55, 55, 55)
+uiStroke.Thickness = 1.5
+uiStroke.Parent = mainFrame
+
+-- Draggable (PC + Mobile)
 local dragging = false
 local dragStart = nil
 local startPos = nil
@@ -38,7 +43,6 @@ mainFrame.InputBegan:Connect(function(input)
         dragging = true
         dragStart = input.Position
         startPos = mainFrame.Position
-        
         input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then
                 dragging = false
@@ -55,82 +59,100 @@ end)
 
 -- Title
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 28)
+title.Size = UDim2.new(1, 0, 0, 32)
 title.BackgroundTransparency = 1
-title.Text = "Workout Toggles"
+title.Text = "WORKOUT TOGGLES"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextScaled = true
-title.Font = Enum.Font.SourceSansBold
+title.Font = Enum.Font.GothamBold
 title.Parent = mainFrame
 
 -- Credits
 local credits = Instance.new("TextLabel")
-credits.Size = UDim2.new(1, 0, 0, 18)
-credits.Position = UDim2.new(0, 0, 1, -18)
+credits.Size = UDim2.new(1, 0, 0, 16)
+credits.Position = UDim2.new(0, 0, 1, -16)
 credits.BackgroundTransparency = 1
 credits.Text = "Made by 5xscripts"
-credits.TextColor3 = Color3.fromRGB(170, 170, 170)
+credits.TextColor3 = Color3.fromRGB(140, 140, 140)
 credits.TextScaled = true
-credits.Font = Enum.Font.SourceSans
-credits.TextTransparency = 0.4
+credits.Font = Enum.Font.Gotham
+credits.TextTransparency = 0.5
 credits.Parent = mainFrame
 
 -- Pushup Button
 local pushupButton = Instance.new("TextButton")
-pushupButton.Size = UDim2.new(0.9, 0, 0, 38) -- Bigger touch target
-pushupButton.Position = UDim2.new(0.05, 0, 0.3, 0)
-pushupButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+pushupButton.Size = UDim2.new(0.9, 0, 0, 40)
+pushupButton.Position = UDim2.new(0.05, 0, 0.29, 0)
+pushupButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 pushupButton.Text = "Pushup: OFF"
-pushupButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+pushupButton.TextColor3 = Color3.fromRGB(255, 80, 80)
 pushupButton.TextScaled = true
-pushupButton.Font = Enum.Font.SourceSansSemibold
+pushupButton.Font = Enum.Font.GothamSemibold
 pushupButton.Parent = mainFrame
 
 local pushCorner = Instance.new("UICorner")
-pushCorner.CornerRadius = UDim.new(0, 6)
+pushCorner.CornerRadius = UDim.new(0, 8)
 pushCorner.Parent = pushupButton
 
 -- Situp Button
 local situpButton = Instance.new("TextButton")
-situpButton.Size = UDim2.new(0.9, 0, 0, 38)
-situpButton.Position = UDim2.new(0.05, 0, 0.65, 0)
-situpButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+situpButton.Size = UDim2.new(0.9, 0, 0, 40)
+situpButton.Position = UDim2.new(0.05, 0, 0.62, 0)
+situpButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 situpButton.Text = "Situp: OFF"
-situpButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+situpButton.TextColor3 = Color3.fromRGB(255, 80, 80)
 situpButton.TextScaled = true
-situpButton.Font = Enum.Font.SourceSansSemibold
+situpButton.Font = Enum.Font.GothamSemibold
 situpButton.Parent = mainFrame
 
 local sitCorner = Instance.new("UICorner")
-sitCorner.CornerRadius = UDim.new(0, 6)
+sitCorner.CornerRadius = UDim.new(0, 8)
 sitCorner.Parent = situpButton
 
--- Toggles
+-- Loop control
+local pushupLoop = nil
+local situpLoop = nil
 local pushupActive = false
 local situpActive = false
 
+-- Pushup Toggle + Loop
 pushupButton.MouseButton1Click:Connect(function()
     pushupActive = not pushupActive
     if pushupActive then
         pushupButton.Text = "Pushup: ON"
-        pushupButton.TextColor3 = Color3.fromRGB(100, 255, 100)
+        pushupButton.TextColor3 = Color3.fromRGB(80, 255, 80)
+        
+        pushupLoop = game:GetService("RunService").Heartbeat:Connect(function()
+            game:GetService("ReplicatedStorage").Remotes.PushUp:FireServer("{}")
+        end)
     else
         pushupButton.Text = "Pushup: OFF"
-        pushupButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+        pushupButton.TextColor3 = Color3.fromRGB(255, 80, 80)
+        if pushupLoop then
+            pushupLoop:Disconnect()
+            pushupLoop = nil
+        end
     end
-    game:GetService("ReplicatedStorage").Remotes.PushUp:FireServer("{}")
 end)
 
+-- Situp Toggle + Loop
 situpButton.MouseButton1Click:Connect(function()
     situpActive = not situpActive
     if situpActive then
         situpButton.Text = "Situp: ON"
-        situpButton.TextColor3 = Color3.fromRGB(100, 255, 100)
+        situpButton.TextColor3 = Color3.fromRGB(80, 255, 80)
+        
+        situpLoop = game:GetService("RunService").Heartbeat:Connect(function()
+            game:GetService("ReplicatedStorage").Remotes.SitUp:FireServer("{}")
+        end)
     else
         situpButton.Text = "Situp: OFF"
-        situpButton.TextColor3 = Color3.fromRGB(255, 100, 100)
+        situpButton.TextColor3 = Color3.fromRGB(255, 80, 80)
+        if situpLoop then
+            situpLoop:Disconnect()
+            situpLoop = nil
+        end
     end
-    game:GetService("ReplicatedStorage").Remotes.SitUp:FireServer("{}")
 end)
 
-print("Workout GUI loaded! (Mobile supported - 5xscripts)")
+print("Modern Workout GUI loaded! (Mobile supported - 5xscripts)")
