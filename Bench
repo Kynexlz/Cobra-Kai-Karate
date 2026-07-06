@@ -1,0 +1,29 @@
+spawn(function()
+    while true do
+        local success, err = pcall(function()
+            local benchRemote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Bench")
+            for i = 1, 1000 do
+                benchRemote:FireServer(false)
+            end
+        end)
+        if not success then
+            warn("Error: " .. tostring(err))
+        end
+        wait(0.1) -- Small delay to prevent potential detection
+    end
+end)
+
+local Player = game.Players.LocalPlayer
+local Mouse = Player:GetMouse()
+
+Mouse.Button1Down:Connect(function()
+    spawn(function()
+        for i = 1, 1000 do
+            local success, err = pcall(function()
+                local benchRemote = game:GetService("RemotedStorage"):WaitForChild("Remotes"):WaitForChild("Bench")
+                benchRemote:FireServer(false)
+            end)
+            if not success then break end
+        end
+    end)
+end)
