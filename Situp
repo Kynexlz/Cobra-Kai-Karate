@@ -1,0 +1,3 @@
+while Wait()do
+    game.ReplicatedStorage.Remotes.SitUp:FireServer("{}")
+end
