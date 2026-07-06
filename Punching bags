@@ -4,7 +4,7 @@ while _G.Krylonix do
        if _G.Krylonix == false then
                return
                end
-               if _G.XuDevs == true then
+               if _G.Krylonix == true then
 
 game:GetService("ReplicatedStorage").Remotes.JumpKick:FireServer()
                wait()
