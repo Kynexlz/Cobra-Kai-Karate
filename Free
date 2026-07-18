@@ -1,136 +1,123 @@
---// Auto Farm GUI
---// by justsscripts
-
 local Players = game:GetService("Players")
-local Player = Players.LocalPlayer
+local LocalPlayer = Players.LocalPlayer
 
 pcall(function()
-	Player.PlayerGui:FindFirstChild("AutoFarmGUI"):Destroy()
+	LocalPlayer.PlayerGui:FindFirstChild("AutoFarmGUI"):Destroy()
 end)
 
--- GUI
+local PushEnabled = false
+local SitEnabled = false
+local BagEnabled = false
+
 local Gui = Instance.new("ScreenGui")
 Gui.Name = "AutoFarmGUI"
 Gui.ResetOnSpawn = false
-Gui.Parent = Player.PlayerGui
+Gui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- Main Frame
 local Main = Instance.new("Frame")
-Main.Size = UDim2.new(0,240,0,195)
-Main.Position = UDim2.new(0.5,-120,0.5,-97)
-Main.BackgroundColor3 = Color3.fromRGB(20,20,20)
+Main.Size = UDim2.new(0,230,0,190)
+Main.Position = UDim2.new(0.5,-115,0.5,-95)
+Main.BackgroundColor3 = Color3.fromRGB(22,22,22)
 Main.BorderSizePixel = 0
+Main.Parent = Gui
 Main.Active = true
 Main.Draggable = true
-Main.Parent = Gui
 
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0,12)
-MainCorner.Parent = Main
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0,10)
+Corner.Parent = Main
 
--- Stroke
 local Stroke = Instance.new("UIStroke")
-Stroke.Color = Color3.fromRGB(45,45,45)
-Stroke.Thickness = 1
+Stroke.Color = Color3.fromRGB(55,55,55)
 Stroke.Parent = Main
 
--- Title
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1,0,0,30)
+Title.Size = UDim2.new(1,0,0,28)
 Title.BackgroundTransparency = 1
 Title.Text = "Auto Farm"
 Title.Font = Enum.Font.GothamBold
+Title.TextSize = 18
 Title.TextColor3 = Color3.new(1,1,1)
-Title.TextScaled = true
 Title.Parent = Main
 
--- Credits
 local Credits = Instance.new("TextLabel")
-Credits.Size = UDim2.new(1,0,0,15)
-Credits.Position = UDim2.new(0,0,0,28)
+Credits.Size = UDim2.new(1,0,0,16)
+Credits.Position = UDim2.new(0,0,0,25)
 Credits.BackgroundTransparency = 1
 Credits.Text = "by justsscripts"
 Credits.Font = Enum.Font.Gotham
-Credits.TextColor3 = Color3.fromRGB(140,140,140)
-Credits.TextScaled = true
+Credits.TextSize = 12
+Credits.TextColor3 = Color3.fromRGB(150,150,150)
 Credits.Parent = Main
 
--- Toggle Creator
-local function CreateToggle(Name, YPos, RemoteName)
+local function CreateToggle(Name,Y,Remote)
 	local Enabled = false
 
 	local Holder = Instance.new("Frame")
 	Holder.Size = UDim2.new(0.9,0,0,38)
-	Holder.Position = UDim2.new(0.05,0,0,YPos)
-	Holder.BackgroundColor3 = Color3.fromRGB(28,28,28)
+	Holder.Position = UDim2.new(0.05,0,0,Y)
+	Holder.BackgroundColor3 = Color3.fromRGB(32,32,32)
 	Holder.BorderSizePixel = 0
 	Holder.Parent = Main
 
-	Instance.new("UICorner",Holder).CornerRadius = UDim.new(0,8)
+	local HolderCorner = Instance.new("UICorner")
+	HolderCorner.CornerRadius = UDim.new(0,8)
+	HolderCorner.Parent = Holder
 
-	local Text = Instance.new("TextLabel")
-	Text.Size = UDim2.new(0.65,0,1,0)
-	Text.Position = UDim2.new(0.05,0,0,0)
-	Text.BackgroundTransparency = 1
-	Text.Text = Name
-	Text.TextColor3 = Color3.new(1,1,1)
-	Text.Font = Enum.Font.GothamMedium
-	Text.TextScaled = true
-	Text.TextXAlignment = Enum.TextXAlignment.Left
-	Text.Parent = Holder
+	local Label = Instance.new("TextLabel")
+	Label.Size = UDim2.new(0.65,0,1,0)
+	Label.Position = UDim2.new(0.05,0,0,0)
+	Label.BackgroundTransparency = 1
+	Label.Font = Enum.Font.GothamMedium
+	Label.Text = Name
+	Label.TextSize = 15
+	Label.TextColor3 = Color3.new(1,1,1)
+	Label.TextXAlignment = Enum.TextXAlignment.Left
+	Label.Parent = Holder
 
-	-- Toggle Button
 	local Toggle = Instance.new("TextButton")
-	Toggle.Size = UDim2.new(0,42,0,22)
-	Toggle.Position = UDim2.new(1,-55,0.5,-11)
+	Toggle.Size = UDim2.new(0,40,0,20)
+	Toggle.Position = UDim2.new(1,-50,0.5,-10)
 	Toggle.Text = ""
-	Toggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
+	Toggle.BackgroundColor3 = Color3.fromRGB(65,65,65)
 	Toggle.BorderSizePixel = 0
 	Toggle.Parent = Holder
 
-	Instance.new("UICorner",Toggle).CornerRadius = UDim.new(1,0)
+	local ToggleCorner = Instance.new("UICorner")
+	ToggleCorner.CornerRadius = UDim.new(1,0)
+	ToggleCorner.Parent = Toggle
 
-	local Circle = Instance.new("Frame")
-	Circle.Size = UDim2.new(0,18,0,18)
-	Circle.Position = UDim2.new(0,2,0.5,-9)
-	Circle.BackgroundColor3 = Color3.new(1,1,1)
-	Circle.BorderSizePixel = 0
-	Circle.Parent = Toggle
+	local Knob = Instance.new("Frame")
+	Knob.Size = UDim2.new(0,16,0,16)
+	Knob.Position = UDim2.new(0,2,0.5,-8)
+	Knob.BackgroundColor3 = Color3.new(1,1,1)
+	Knob.BorderSizePixel = 0
+	Knob.Parent = Toggle
 
-	Instance.new("UICorner",Circle).CornerRadius = UDim.new(1,0)
+	local KnobCorner = Instance.new("UICorner")
+	KnobCorner.CornerRadius = UDim.new(1,0)
+	KnobCorner.Parent = Knob
 
 	Toggle.MouseButton1Click:Connect(function()
 		Enabled = not Enabled
 
 		if Enabled then
 			Toggle.BackgroundColor3 = Color3.fromRGB(0,170,255)
-			Circle:TweenPosition(
-				UDim2.new(1,-20,0.5,-9),
-				Enum.EasingDirection.Out,
-				Enum.EasingStyle.Quad,
-				0.15,
-				true
-			)
+			Knob.Position = UDim2.new(1,-18,0.5,-8)
 
 			task.spawn(function()
 				while Enabled do
-					game.ReplicatedStorage.Remotes[RemoteName]:FireServer("{}")
+					game.ReplicatedStorage.Remotes[Remote]:FireServer("{}")
 					task.wait()
 				end
 			end)
 		else
-			Toggle.BackgroundColor3 = Color3.fromRGB(60,60,60)
-			Circle:TweenPosition(
-				UDim2.new(0,2,0.5,-9),
-				Enum.EasingDirection.Out,
-				Enum.EasingStyle.Quad,
-				0.15,
-				true
-			)
+			Toggle.BackgroundColor3 = Color3.fromRGB(65,65,65)
+			Knob.Position = UDim2.new(0,2,0.5,-8)
 		end
 	end)
 end
 
-CreateToggle("Push Up",50,"PushUp")
-CreateToggle("Sit-Up",95,"SitUp")
-CreateToggle("Punching Bag",140,"LegSweep")
+CreateToggle("Push Up",45,"PushUp")
+CreateToggle("Sit-Up",88,"SitUp")
+CreateToggle("Punching Bag",131,"LegSweep")
