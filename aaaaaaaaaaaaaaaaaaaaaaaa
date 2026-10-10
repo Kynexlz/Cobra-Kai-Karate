@@ -24,12 +24,14 @@ local Window = Rayfield:CreateWindow({
     sidebarLayout = true,
 })
 
-local StatTab = Window:CreateTab({ name = "Autofarm" })
+local StatTab = Window:CreateTab({ name = "Stat" })
 
 local Event = game:GetService("ReplicatedStorage"):WaitForChild("BridgeNet2"):WaitForChild("dataRemoteEvent")
 
 local StrengthEnabled = false
 local HealthEnabled = false
+local PullUpEnabled = false
+local BenchPressEnabled = false
 local statLoopRunning = false
 
 local function startStatLoop()
@@ -37,26 +39,18 @@ local function startStatLoop()
     statLoopRunning = true
 
     task.spawn(function()
-        while StrengthEnabled or HealthEnabled do
-            if StrengthEnabled then
+        while PullUpEnabled do
+            if PullUpEnabled then
                 Event:FireServer({
                     nil,
-                    "\029"
-                })
-                task.wait(0.1)
-            end
-
-            if HealthEnabled then
-                Event:FireServer({
-                    nil,
-                    "\030"
+                    "&"
                 })
                 task.wait(0.1)
             end
         end
 
         statLoopRunning = false
-        if StrengthEnabled or HealthEnabled then
+        if PullUpEnabled then
             startStatLoop()
         end
     end)
@@ -65,8 +59,7 @@ end
 StatTab:CreateButton({
     name = "Unload Orbit",
     callback = function()
-        StrengthEnabled = false
-        HealthEnabled = false
+        PullUpEnabled = false
         Event:FireServer({
             false,
             "\\v"
@@ -77,45 +70,144 @@ StatTab:CreateButton({
 
 local divider = StatTab:CreateDivider()
 
-divider:Set("Stats")
-divider:Set("Stats")
+divider:Set("Gamepass")
+divider:Set("Gamepass")
 
 StatTab:CreateToggle({
-    name = "Strength Farm",
+    name = "Pull Up",
     value = false,
     callback = function(enabled)
-        StrengthEnabled = enabled
+        PullUpEnabled = enabled
         if enabled then
             startStatLoop()
         end
     end,
 })
 
-StatTab:CreateToggle({
-    name = "Health Farm",
-    value = false,
-    callback = function(enabled)
-        HealthEnabled = enabled
-        if enabled then
-            startStatLoop()
-        end
-    end,
-})
+local watchedUsers = {
+    ["BossSlayer56"] = true,
+    ["Sleepie313"] = true,
+    ["unroot"] = true,
+    ["verycooltiger"] = true,
+}
 
-StatTab:CreateToggle({
-    name = "Stamina",
-    value = false,
-    callback = function(enabled)
-        if enabled then
-            Event:FireServer({
-                true,
-                "\v"
-            })
-        else
-            Event:FireServer({
-                false,
-                "\v"
-            })
+local alertedPlayers = {}
+local checkPlayer
+
+local function showWatchlistAlert(targetName)
+    local PlayerGui = player:WaitForChild("PlayerGui")
+
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "WatchlistAlert"
+    gui.ResetOnSpawn = false
+    gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    gui.DisplayOrder = 9999
+    gui.Parent = PlayerGui
+
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(0, 320, 0, 160)
+    frame.Position = UDim2.new(0.5, -160, 0.5, -80)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    frame.BorderSizePixel = 0
+    frame.Parent = gui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = frame
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(60, 60, 60)
+    stroke.Thickness = 1
+    stroke.Parent = frame
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, -20, 0, 30)
+    title.Position = UDim2.new(0, 10, 0, 10)
+    title.BackgroundTransparency = 1
+    title.Text = "⚠ Watchlist Alert"
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 18
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = frame
+
+    local message = Instance.new("TextLabel")
+    message.Size = UDim2.new(1, -20, 0, 50)
+    message.Position = UDim2.new(0, 10, 0, 45)
+    message.BackgroundTransparency = 1
+    message.Text = targetName .. " has joined this server."
+    message.Font = Enum.Font.Gotham
+    message.TextSize = 16
+    message.TextColor3 = Color3.fromRGB(220, 220, 220)
+    message.TextWrapped = true
+    message.TextXAlignment = Enum.TextXAlignment.Left
+    message.Parent = frame
+
+    local countdownLabel = Instance.new("TextLabel")
+    countdownLabel.Size = UDim2.new(1, -20, 0, 20)
+    countdownLabel.Position = UDim2.new(0, 10, 0, 95)
+    countdownLabel.BackgroundTransparency = 1
+    countdownLabel.Text = "Leaving in 5s..."
+    countdownLabel.Font = Enum.Font.Gotham
+    countdownLabel.TextSize = 14
+    countdownLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+    countdownLabel.TextXAlignment = Enum.TextXAlignment.Left
+    countdownLabel.Parent = frame
+
+    local stayButton = Instance.new("TextButton")
+    stayButton.Size = UDim2.new(0, 100, 0, 30)
+    stayButton.Position = UDim2.new(1, -110, 1, -40)
+    stayButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    stayButton.Text = "Stay"
+    stayButton.Font = Enum.Font.GothamBold
+    stayButton.TextSize = 16
+    stayButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    stayButton.AutoButtonColor = true
+    stayButton.Parent = frame
+
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 6)
+    buttonCorner.Parent = stayButton
+
+    local cancelled = false
+
+    stayButton.MouseButton1Click:Connect(function()
+        cancelled = true
+        gui:Destroy()
+    end)
+
+    task.spawn(function()
+        for i = 5, 1, -1 do
+            if cancelled then
+                return
+            end
+            countdownLabel.Text = "Leaving in " .. i .. "s..."
+            task.wait(1)
         end
-    end,
-})
+
+        if not cancelled then
+            gui:Destroy()
+            pcall(function()
+                player:Kick("Left due to watchlist match: " .. targetName)
+            end)
+        end
+    end)
+end
+
+checkPlayer = function(plr)
+    if plr == player then
+        return
+    end
+
+    local lname = plr.Name:lower()
+    if watchedUsers[lname] and not alertedPlayers[plr.UserId] then
+        alertedPlayers[plr.UserId] = true
+        showWatchlistAlert(plr.Name)
+    end
+end
+
+Players.PlayerAdded:Connect(checkPlayer)
+
+for _, plr in ipairs(Players:GetPlayers()) do
+    checkPlayer(plr)
+end
