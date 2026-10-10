@@ -1,14 +1,9 @@
-```lua
-getgenv().RAYFIELD_SECURE = true
-
-local Rayfield = loadstring(game:HttpGet(
-    "https://sirius.menu/rayfield"
-))()
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
 local Window = Rayfield:CreateWindow({
-    Name = "Orbit | Cobra Kai",
-    LoadingTitle = "Orbit | Cobra Kai",
-    LoadingSubtitle = "Scripted by Kai | Edited by MobileExploits",
+    Name = "Cobra Kai",
+    LoadingTitle = "Scripted by Kai | Edited by Kynexl",
+    LoadingSubtitle = "Orbit",
 
     ConfigurationSaving = {
         Enabled = false,
